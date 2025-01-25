@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class Boss : MonoBehaviour
 {
-    private enum bossStatus
-    {
+    private enum bossStatus{
         IDLE,       //Do nothing
         CHASE,     //setDestination player
         CATCH,     //Animation 
@@ -18,11 +18,11 @@ public class Boss : MonoBehaviour
     private bool hasPlayerMoved = false;
 
     [SerializeField] private Transform player;
-    [SerializeField] private Transform searchSpace;
+    [SerializeField] private List<Transform> searchSpaces;
     private NavMeshAgent agent;
+    private Transform currentSearchArea;
 
-    void Awake()
-    {
+    void Awake(){
         agent = GetComponent<NavMeshAgent>();
         initialPlayerPosition = player.position;
     }
@@ -31,8 +31,7 @@ public class Boss : MonoBehaviour
         //if(!hasPlayerMoved){
         //    CheckPlayerMovement();
         //}
-        switch (boss_status)
-        {
+        switch(boss_status){
             case bossStatus.IDLE:
                 break;
             case bossStatus.CHASE:
@@ -42,7 +41,11 @@ public class Boss : MonoBehaviour
                 Debug.Log("Game Over!");
                 break;
             case bossStatus.SEARCH:
-                SearchPlayer();
+                if (agent.remainingDistance < 0.5f)
+                {
+                    SelectRandomSearchArea();
+                    SetRandomSearchDestination();
+                }
                 break;
             case bossStatus.DOUBT:
                 break;
@@ -51,33 +54,38 @@ public class Boss : MonoBehaviour
         }
     }
 
-    void CheckPlayerMovement()
-    {
-        if (Vector3.Distance(initialPlayerPosition, player.position) > 0.1f)
-        {
+    void CheckPlayerMovement(){
+        if (Vector3.Distance(initialPlayerPosition, player.position) > 0.1f){
             hasPlayerMoved = true;
             boss_status = bossStatus.CHASE;
             Debug.Log("Player moved, game started, boss in now chasing!");
         }
     }
 
-    void SearchPlayer()
-    {
-        if (agent.remainingDistance < 0.5f)
-        {
+    void SearchPlayer(){
+        if (agent.remainingDistance < 0.5f){
             SetRandomSearchDestination();
         }
     }
 
+    void SelectRandomSearchArea()
+    {
+        // Rastgele bir search space seç
+        int randomIndex = Random.Range(0, searchSpaces.Count);
+        currentSearchArea = searchSpaces[randomIndex];
+        Debug.Log("Boss is now searching in: " + currentSearchArea.name);
+    }
     void SetRandomSearchDestination()
     {
-        Bounds bounds = searchSpace.GetComponent<Collider>().bounds;
+        if (currentSearchArea == null) SelectRandomSearchArea();
+
+        Bounds bounds = currentSearchArea.GetComponent<Collider>().bounds;
 
         float randomX = Random.Range(bounds.min.x, bounds.max.x);
         float randomZ = Random.Range(bounds.min.z, bounds.max.z);
         Vector3 randomPos = new Vector3(randomX, transform.position.y, randomZ);
 
         agent.SetDestination(randomPos);
-        Debug.Log("Boss is searching the position:" + randomPos);
+        Debug.Log("Boss is searching at position: " + randomPos);
     }
 }
