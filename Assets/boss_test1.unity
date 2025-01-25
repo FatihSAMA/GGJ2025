@@ -747,7 +747,7 @@ GameObject:
   - component: {fileID: 755082515}
   - component: {fileID: 755082514}
   m_Layer: 0
-  m_Name: ObjectAtIdle
+  m_Name: ObjectAtSearch_Space
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

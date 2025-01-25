@@ -1,4 +1,3 @@
-using StarterAssets;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -13,12 +12,13 @@ public class Boss : MonoBehaviour
         BREAK,      //Door break
     }
 
-    private bossStatus boss_status = bossStatus.IDLE;
+    private bossStatus boss_status = bossStatus.SEARCH;
     private Vector3 initialPlayerPosition;
     private bool hasPlayerMoved = false;
 
-    [SerializeField] Transform player;
-    NavMeshAgent agent;
+    [SerializeField] private Transform player;
+    [SerializeField] private Transform searchSpace;
+    private NavMeshAgent agent;
 
     void Awake(){
         agent = GetComponent<NavMeshAgent>();
@@ -26,9 +26,9 @@ public class Boss : MonoBehaviour
     }
     void Update()
     {
-        if(!hasPlayerMoved){
-            CheckPlayerMovement();
-        }
+        //if(!hasPlayerMoved){
+        //    CheckPlayerMovement();
+        //}
         switch(boss_status){
             case bossStatus.IDLE:
                 break;
@@ -39,7 +39,7 @@ public class Boss : MonoBehaviour
                 Debug.Log("Game Over!");
                 break;
             case bossStatus.SEARCH:
-                //agent.SetDestination()
+                SearchPlayer();
                 break;
             case bossStatus.DOUBT:
                 break;
@@ -54,5 +54,22 @@ public class Boss : MonoBehaviour
             boss_status = bossStatus.CHASE;
             Debug.Log("Player moved, game started, boss in now chasing!");
         }
+    }
+
+    void SearchPlayer(){
+        if (agent.remainingDistance < 0.5f){
+            SetRandomSearchDestination();
+        }
+    }
+
+    void SetRandomSearchDestination(){
+        Bounds bounds = searchSpace.GetComponent<Collider>().bounds;
+
+        float randomX = Random.Range(bounds.min.x, bounds.max.x);
+        float randomZ = Random.Range(bounds.min.z, bounds.max.z);
+        Vector3 randomPos = new Vector3(randomX, transform.position.y, randomZ);
+
+        agent.SetDestination(randomPos);
+        Debug.Log("Boss is searching the position:" + randomPos);
     }
 }
