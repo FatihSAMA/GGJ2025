@@ -3,6 +3,7 @@ using UnityEngine;
 public class BubbleObstacle : MonoBehaviour
 {
     public float force = 3000;
+    [SerializeField] GameObject smoke;
 
     void OnCollisionEnter(Collision c)
     {
@@ -14,6 +15,9 @@ public class BubbleObstacle : MonoBehaviour
             {
 
                 rb.AddForce(-c.transform.forward.normalized * force);
+                Destroy(gameObject);
+                GameObject _smoke = Instantiate(smoke, transform.position, Quaternion.identity);
+                Destroy(_smoke, 1f);
 
             }
         }

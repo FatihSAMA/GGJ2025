@@ -3,25 +3,34 @@ using UnityEngine;
 public class PlayerInteraction : MonoBehaviour
 {
     [SerializeField] GameObject interactText;
+    [SerializeField] GameObject smoke;
 
     private RaycastHit hit;
     private bool ray = false;
+    private Collider col;
+    private float offset;
+
+    private void Awake()
+    {
+        offset = col != null ? col.bounds.extents.y : 1f;
+    }
 
     private void Start()
     {
-            interactText.gameObject.SetActive(false);
-
+        interactText.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        if (ray && hit.transform.CompareTag("Bubble"))
+        if (ray && hit.transform != null && hit.transform.CompareTag("Bubble"))
         {
             interactText.gameObject.SetActive(true);
 
             if (isPressedE())
             {
-                Destroy(hit.transform.gameObject, 1f);
+                GameObject _smoke = Instantiate(smoke, hit.transform.position, Quaternion.identity);
+                Destroy(hit.transform.gameObject);
+                Destroy(_smoke, 1f);
             }
         }
         else
@@ -33,8 +42,9 @@ public class PlayerInteraction : MonoBehaviour
 
     private void FixedUpdate()
     {
-
-        ray = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, 1.5f);
+        Vector3 rayStart = transform.position + Vector3.up * offset;
+        ray = Physics.Raycast(rayStart, transform.TransformDirection(Vector3.forward), out hit, 2f);
+        //Debug.DrawRay(rayStart, transform.TransformDirection(Vector3.forward) * 2f, Color.red);
 
     }
 
