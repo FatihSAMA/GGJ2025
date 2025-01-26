@@ -2,58 +2,98 @@ using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [SerializeField] GameObject interactText;
-    [SerializeField] GameObject smoke;
+    [SerializeField] private GameObject interactText;
+    [SerializeField] private GameObject smoke;
+    [SerializeField] private float interactionRange = 2f;
 
     private RaycastHit hit;
-    private bool ray = false;
     private Collider col;
     private float offset;
 
     private void Awake()
     {
+        col = GetComponent<Collider>();
         offset = col != null ? col.bounds.extents.y : 1f;
     }
 
     private void Start()
     {
-        interactText.gameObject.SetActive(false);
+        interactText.SetActive(false);
     }
 
     private void Update()
     {
-        if (ray && hit.transform != null && hit.transform.CompareTag("Bubble"))
+        if (TryGetInteractionHit(out hit))
         {
-            interactText.gameObject.SetActive(true);
+            HandleInteraction();
+        }
+        else
+        {
+            interactText.SetActive(false);
+        }
+    }
 
-            if (isPressedE())
+    private bool TryGetInteractionHit(out RaycastHit hit)
+    {
+        Vector3 rayStart = transform.position + Vector3.up * offset;
+        return Physics.Raycast(rayStart, transform.forward, out hit, interactionRange);
+    }
+        
+    private void HandleInteraction()
+    {
+        if (hit.transform.CompareTag("Bubble"))
+        {
+            ShowInteractText();
+            if (IsPressedE())
             {
-                GameObject _smoke = Instantiate(smoke, hit.transform.position, Quaternion.identity);
-                Destroy(hit.transform.gameObject);
-                Destroy(_smoke, 1f);
+                InteractWithBubble();
+            }
+        }
+        else if (hit.transform.CompareTag("Door"))
+        {
+            ShowInteractText();
+            if (IsPressedE())
+            {
+                InteractWithDoor();
+            }
+        }
+        else if (hit.transform.CompareTag("LockedDoor"))
+        {
+            ShowInteractText();
+            if (IsPressedE())
+            {
+                // TODO: kapý kilit sesi oynat
             }
         }
         else
         {
-            interactText.gameObject.SetActive(false);
+            interactText.SetActive(false);
         }
     }
 
-
-    private void FixedUpdate()
+    private void ShowInteractText()
     {
-        Vector3 rayStart = transform.position + Vector3.up * offset;
-        ray = Physics.Raycast(rayStart, transform.TransformDirection(Vector3.forward), out hit, 2f);
-        //Debug.DrawRay(rayStart, transform.TransformDirection(Vector3.forward) * 2f, Color.red);
-
+        interactText.SetActive(true);
     }
 
-
-    private bool isPressedE()
+    private bool IsPressedE()
     {
-        if (Input.GetKeyDown(KeyCode.E)) {  return true; }
-        return false;
+        return Input.GetKeyDown(KeyCode.E);
     }
 
+    private void InteractWithBubble()
+    {
+        GameObject _smoke = Instantiate(smoke, hit.transform.position, Quaternion.identity);
+        Destroy(hit.transform.gameObject);
+        Destroy(_smoke, 1f);
+    }
 
+    private void InteractWithDoor()
+    {
+        Animator doorAnimator = hit.transform.GetComponent<Animator>();
+        if (doorAnimator != null)
+        {
+            doorAnimator.SetBool("open", true);
+        }
+    }
 }

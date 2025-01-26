@@ -8,15 +8,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
+
 
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
     using System.Net;
 #endif
 
 public class FirstPersonController : MonoBehaviour
 {
     private Rigidbody rb;
+
+    private Animator animator;
 
     #region Camera Movement Variables
 
@@ -134,6 +138,8 @@ public class FirstPersonController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+
+        animator = GetComponentInChildren<Animator>();
 
         crosshairObject = GetComponentInChildren<Image>();
 
@@ -378,10 +384,12 @@ public class FirstPersonController : MonoBehaviour
             if (targetVelocity.x != 0 || targetVelocity.z != 0 && isGrounded)
             {
                 isWalking = true;
+                animator.SetBool("isWalkink", true);
             }
             else
             {
                 isWalking = false;
+                animator.SetBool("isWalkink", false);
             }
 
             // All movement calculations shile sprint is active

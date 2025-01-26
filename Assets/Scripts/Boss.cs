@@ -13,38 +13,50 @@ public class Boss : MonoBehaviour
         BREAK,      //Door break
     }
 
-    private bossStatus boss_status = bossStatus.SEARCH;
+    private bossStatus boss_status = bossStatus.IDLE;
     private Vector3 initialPlayerPosition;
     private bool hasPlayerMoved = false;
 
     [SerializeField] private Transform player;
     [SerializeField] private List<Transform> searchSpaces;
+    [SerializeField] private float hideDistance = 15f;
     private NavMeshAgent agent;
     private Transform currentSearchArea;
-
+    [SerializeField] private float chaseDistance = 10f; //Search radious threshold
+    [SerializeField] private PlayerController playerController; // Take hide situation from player.
     void Awake(){
         agent = GetComponent<NavMeshAgent>();
         initialPlayerPosition = player.position;
+        playerController = player.GetComponent<PlayerController>();
     }
     void Update()
     {
-        //if(!hasPlayerMoved){
-        //    CheckPlayerMovement();
-        //}
-        switch(boss_status){
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (!hasPlayerMoved)
+        {
+            CheckPlayerMovement();
+        }
+        switch (boss_status){
             case bossStatus.IDLE:
                 break;
             case bossStatus.CHASE:
                 agent.SetDestination(player.position);
+
+                ControlIfHide(distanceToPlayer);
                 break;
             case bossStatus.CATCH:
                 Debug.Log("Game Over!");
                 break;
             case bossStatus.SEARCH:
-                if (agent.remainingDistance < 0.5f)
+                if (agent.remainingDistance < 5f)
                 {
                     SelectRandomSearchArea();
                     SetRandomSearchDestination();
+                }
+
+                if (distanceToPlayer < chaseDistance)
+                {
+                    boss_status = bossStatus.CHASE;
                 }
                 break;
             case bossStatus.DOUBT:
@@ -87,5 +99,13 @@ public class Boss : MonoBehaviour
 
         agent.SetDestination(randomPos);
         Debug.Log("Boss is searching at position: " + randomPos);
+    }
+    void ControlIfHide(float distanceToPlayer)
+    {
+        if (playerController.IsHiding && distanceToPlayer >= hideDistance)
+        {
+            boss_status = bossStatus.SEARCH;
+            Debug.Log("Boss lost the player! Switching to SEARCH mode.");
+        }
     }
 }
