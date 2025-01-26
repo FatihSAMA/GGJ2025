@@ -2,98 +2,82 @@ using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [SerializeField] private GameObject interactText;
-    [SerializeField] private GameObject smoke;
-    [SerializeField] private float interactionRange = 2f;
+    [SerializeField] GameObject interactText;
+    [SerializeField] GameObject smoke;
 
     private RaycastHit hit;
+    private bool ray = false;
     private Collider col;
     private float offset;
 
     private void Awake()
     {
-        col = GetComponent<Collider>();
         offset = col != null ? col.bounds.extents.y : 1f;
     }
 
     private void Start()
     {
-        interactText.SetActive(false);
+        interactText.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        if (TryGetInteractionHit(out hit))
+        if (ray && hit.transform != null)
         {
-            HandleInteraction();
+
+            if (hit.transform.CompareTag("Bubble"))
+            {
+                interactText.gameObject.SetActive(true);
+                if (isPressedE())
+                {
+                    GameObject _smoke = Instantiate(smoke, hit.transform.position, Quaternion.identity);
+                    Destroy(hit.transform.gameObject);
+                    Destroy(_smoke, 1f);
+                }
+            }
+
+            Debug.Log("test");
+            if (hit.transform.CompareTag("Door"))
+            {
+                interactText.gameObject.SetActive(true);
+                if (isPressedE())
+                {
+                    hit.transform.GetComponent<Animator>().SetBool("open", true);
+                    hit.transform.GetComponent<BoxCollider>().isTrigger = true;
+                }
+            }
+
+            if (hit.transform.CompareTag("LockedDoor"))
+            {
+                interactText.gameObject.SetActive(true);
+                if (isPressedE())
+                {
+                    // TODO: kapý kilit sesi oynat  
+                }
+            }
+
         }
         else
         {
-            interactText.SetActive(false);
+            interactText.gameObject.SetActive(false);
         }
     }
 
-    private bool TryGetInteractionHit(out RaycastHit hit)
+
+    private void FixedUpdate()
     {
         Vector3 rayStart = transform.position + Vector3.up * offset;
-        return Physics.Raycast(rayStart, transform.forward, out hit, interactionRange);
-    }
-        
-    private void HandleInteraction()
-    {
-        if (hit.transform.CompareTag("Bubble"))
-        {
-            ShowInteractText();
-            if (IsPressedE())
-            {
-                InteractWithBubble();
-            }
-        }
-        else if (hit.transform.CompareTag("Door"))
-        {
-            ShowInteractText();
-            if (IsPressedE())
-            {
-                InteractWithDoor();
-            }
-        }
-        else if (hit.transform.CompareTag("LockedDoor"))
-        {
-            ShowInteractText();
-            if (IsPressedE())
-            {
-                // TODO: kapý kilit sesi oynat
-            }
-        }
-        else
-        {
-            interactText.SetActive(false);
-        }
+        ray = Physics.Raycast(rayStart, Camera.main.transform.forward, out hit, 2.5f);
+        Debug.DrawRay(rayStart, Camera.main.transform.forward * 2.5f, Color.red);
+
     }
 
-    private void ShowInteractText()
+
+    private bool isPressedE()
     {
-        interactText.SetActive(true);
+        if (Input.GetKeyDown(KeyCode.E)) { return true; }
+        return false;
     }
 
-    private bool IsPressedE()
-    {
-        return Input.GetKeyDown(KeyCode.E);
-    }
 
-    private void InteractWithBubble()
-    {
-        GameObject _smoke = Instantiate(smoke, hit.transform.position, Quaternion.identity);
-        Destroy(hit.transform.gameObject);
-        Destroy(_smoke, 1f);
-    }
-
-    private void InteractWithDoor()
-    {
-        Animator doorAnimator = hit.transform.GetComponent<Animator>();
-        if (doorAnimator != null)
-        {
-            doorAnimator.SetBool("open", true);
-        }
-    }
 }

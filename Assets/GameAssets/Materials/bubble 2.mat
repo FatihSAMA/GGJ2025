@@ -7,9 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: bubble
+  m_Name: bubble 2
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_Parent: {fileID: 2100000, guid: 8006a5e179d184b41919f6681b33807c, type: 2}
+  m_Parent: {fileID: 2100000, guid: 7df9f14437e77874db5d2749f13b5ec6, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _ALPHAPREMULTIPLY_ON
@@ -34,8 +34,8 @@ Material:
     - _AlphaClip: 0
     - _ReceiveShadows: 1
     m_Colors:
-    - _BaseColor: {r: 0.86415094, g: 0.0048913495, b: 0.6505066, a: 0.8235294}
-    - _Color: {r: 0.86415094, g: 0.0048913495, b: 0.65050656, a: 0.8235294}
+    - _BaseColor: {r: 0.8627451, g: 0.4616559, b: 0.003921565, a: 0.8235294}
+    - _Color: {r: 0.8627451, g: 0.46165586, b: 0.003921565, a: 0.8235294}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7237257409128651129

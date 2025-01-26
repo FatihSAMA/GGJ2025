@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
+using System.Collections;
 
 public class Boss : MonoBehaviour
 {
-    private enum bossStatus{
+    public enum bossStatus{
         IDLE,       //Do nothing
         CHASE,     //setDestination player
         CATCH,     //Animation 
@@ -13,7 +14,8 @@ public class Boss : MonoBehaviour
         BREAK,      //Door break
     }
 
-    private bossStatus boss_status = bossStatus.IDLE;
+
+    public bossStatus boss_status = bossStatus.IDLE;
     private Vector3 initialPlayerPosition;
     private bool hasPlayerMoved = false;
 
@@ -45,7 +47,7 @@ public class Boss : MonoBehaviour
                 ControlIfHide(distanceToPlayer);
                 break;
             case bossStatus.CATCH:
-                Debug.Log("Game Over!");
+                //Debug.Log("Game Over!");
                 break;
             case bossStatus.SEARCH:
                 if (agent.remainingDistance < 5f)
@@ -62,6 +64,7 @@ public class Boss : MonoBehaviour
             case bossStatus.DOUBT:
                 break;
             case bossStatus.BREAK:
+                agent.ResetPath();
                 break;
         }
     }
@@ -70,7 +73,7 @@ public class Boss : MonoBehaviour
         if (Vector3.Distance(initialPlayerPosition, player.position) > 0.1f){
             hasPlayerMoved = true;
             boss_status = bossStatus.CHASE;
-            Debug.Log("Player moved, game started, boss in now chasing!");
+            //Debug.Log("Player moved, game started, boss in now chasing!");
         }
     }
 
@@ -85,7 +88,7 @@ public class Boss : MonoBehaviour
         // Rastgele bir search space seç
         int randomIndex = Random.Range(0, searchSpaces.Count);
         currentSearchArea = searchSpaces[randomIndex];
-        Debug.Log("Boss is now searching in: " + currentSearchArea.name);
+        //Debug.Log("Boss is now searching in: " + currentSearchArea.name);
     }
     void SetRandomSearchDestination()
     {
@@ -98,14 +101,17 @@ public class Boss : MonoBehaviour
         Vector3 randomPos = new Vector3(randomX, transform.position.y, randomZ);
 
         agent.SetDestination(randomPos);
-        Debug.Log("Boss is searching at position: " + randomPos);
+        //Debug.Log("Boss is searching at position: " + randomPos);
     }
     void ControlIfHide(float distanceToPlayer)
     {
         if (playerController.IsHiding && distanceToPlayer >= hideDistance)
         {
             boss_status = bossStatus.SEARCH;
-            Debug.Log("Boss lost the player! Switching to SEARCH mode.");
+            //Debug.Log("Boss lost the player! Switching to SEARCH mode.");
         }
     }
+
+
+
 }
