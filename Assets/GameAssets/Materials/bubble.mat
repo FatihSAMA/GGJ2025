@@ -34,8 +34,8 @@ Material:
     - _AlphaClip: 0
     - _ReceiveShadows: 1
     m_Colors:
-    - _BaseColor: {r: 0.262264, g: 0.86182487, b: 1, a: 0.8235294}
-    - _Color: {r: 0.26226398, g: 0.86182487, b: 1, a: 0.8235294}
+    - _BaseColor: {r: 0.86415094, g: 0.0048913495, b: 0.6505066, a: 0.8235294}
+    - _Color: {r: 0.86415094, g: 0.0048913495, b: 0.65050656, a: 0.8235294}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7237257409128651129
