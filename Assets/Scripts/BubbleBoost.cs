@@ -3,6 +3,13 @@ using UnityEngine;
 public class BubbleBoost : MonoBehaviour
 {
     public float forwardForce = 550f;
+    AudioSource source;
+
+    private void Awake()
+    {
+        source = GetComponent<AudioSource>();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -13,7 +20,7 @@ public class BubbleBoost : MonoBehaviour
             dir = dir.normalized;
 
             playerRb.AddForce(dir * forwardForce);
-
+            source.Play();
             Destroy(gameObject, 1f);
         }
     }

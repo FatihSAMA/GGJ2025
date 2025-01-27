@@ -10,9 +10,13 @@ public class PlayerInteraction : MonoBehaviour
     private Collider col;
     private float offset;
 
+    public AudioClip[] audioClips;
+    AudioSource source;
+
     private void Awake()
     {
         offset = col != null ? col.bounds.extents.y : 1f;
+        source = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -32,11 +36,11 @@ public class PlayerInteraction : MonoBehaviour
                 {
                     GameObject _smoke = Instantiate(smoke, hit.transform.position, Quaternion.identity);
                     Destroy(hit.transform.gameObject);
+                    source.PlayOneShot(audioClips[0]);
                     Destroy(_smoke, 1f);
                 }
             }
 
-            Debug.Log("test");
             if (hit.transform.CompareTag("Door"))
             {
                 interactText.gameObject.SetActive(true);
@@ -44,6 +48,7 @@ public class PlayerInteraction : MonoBehaviour
                 {
                     hit.transform.GetComponent<Animator>().SetBool("open", true);
                     hit.transform.GetComponent<BoxCollider>().isTrigger = true;
+                    source.PlayOneShot(audioClips[1]);
                 }
             }
 
@@ -52,7 +57,7 @@ public class PlayerInteraction : MonoBehaviour
                 interactText.gameObject.SetActive(true);
                 if (isPressedE())
                 {
-                    // TODO: kapý kilit sesi oynat  
+                    //source.PlayOneShot(audioClips[2]);
                 }
             }
 

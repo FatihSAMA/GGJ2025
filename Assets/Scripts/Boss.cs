@@ -26,6 +26,10 @@ public class Boss : MonoBehaviour
     private Transform currentSearchArea;
     [SerializeField] private float chaseDistance = 10f; //Search radious threshold
     [SerializeField] private PlayerController playerController; // Take hide situation from player.
+
+    public AudioClip kurma, kırma;
+    public AudioSource source;
+
     void Awake(){
         agent = GetComponent<NavMeshAgent>();
         initialPlayerPosition = player.position;
@@ -33,6 +37,12 @@ public class Boss : MonoBehaviour
     }
     void Update()
     {
+        if (GameManager.Instance.isGameOver)
+        {
+            agent.ResetPath();
+            return;
+        }
+
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (!hasPlayerMoved)
         {
@@ -40,16 +50,22 @@ public class Boss : MonoBehaviour
         }
         switch (boss_status){
             case bossStatus.IDLE:
+                source.clip = kurma;
+                source.Play();
                 break;
             case bossStatus.CHASE:
                 agent.SetDestination(player.position);
 
                 ControlIfHide(distanceToPlayer);
+                source.clip = kurma;
+                source.Play();
                 break;
             case bossStatus.CATCH:
                 //Debug.Log("Game Over!");
                 break;
             case bossStatus.SEARCH:
+                source.clip = kurma;
+                source.Play();
                 if (agent.remainingDistance < 5f)
                 {
                     SelectRandomSearchArea();
@@ -65,6 +81,8 @@ public class Boss : MonoBehaviour
                 break;
             case bossStatus.BREAK:
                 agent.ResetPath();
+                source.clip = kırma;
+                source.Play();
                 break;
         }
     }
@@ -112,6 +130,16 @@ public class Boss : MonoBehaviour
         }
     }
 
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.CompareTag("Player"))
+        {
+            GameManager.Instance.FailGame();
+            RenderSettings.fogDensity = 1.0f;
+            RenderSettings.fogColor = Color.red;
+        }
+    }
 
 
 }
